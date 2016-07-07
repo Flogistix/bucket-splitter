@@ -63,15 +63,15 @@ divideS3BucketBy bucket divideBy region = do
 
         namedObjs = assignArrayNames 0 sObj
 
-    liftIO . mapM openAndWriteObjects $ namedObjs
+    liftIO . mapM (openAndWriteObjects bucket') $ namedObjs
 
   where
-    printKeyToHandle :: Handle -> Object -> IO ()
-    printKeyToHandle h o = Text.hPutStrLn h $ o ^. oKey . _ObjectKey
+    printKeyToHandle :: Text -> Handle -> Object -> IO ()
+    printKeyToHandle bucket h o = Text.hPutStrLn h $ "s3://" <> bucket <> "/" <> (o ^. oKey . _ObjectKey)
 
-    openAndWriteObjects :: NamedObjects Object -> IO ()
-    openAndWriteObjects (name, objs) = do
+    openAndWriteObjects :: Text -> NamedObjects Object -> IO ()
+    openAndWriteObjects bucket (name, objs) = do
       h <- openFile name WriteMode
-      mapM (printKeyToHandle h) objs
+      mapM (printKeyToHandle bucket h) objs
       hClose h
 

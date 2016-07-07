@@ -28,7 +28,7 @@ assignArrayNames :: Int -> [[Object]] -> [NamedObjects Object]
 assignArrayNames _ [] = []
 assignArrayNames i (x:xs) = (name, x) : assignArrayNames (i+1) xs
   where
-    name = "s3-" <> show i <> ".list"
+    name = "s3-" <> show i
 
 splitEvery :: Int -> [a] -> [[a]]
 splitEvery _ [] = []
@@ -63,15 +63,15 @@ divideS3BucketBy bucket divideBy region = do
 
         namedObjs = assignArrayNames 0 sObj
 
-    liftIO . mapM (openAndWriteObjects bucket') $ namedObjs
+    liftIO . mapM openAndWriteObjects $ namedObjs
 
   where
-    printKeyToHandle :: Text -> Handle -> Object -> IO ()
-    printKeyToHandle bucket h o = Text.hPutStrLn h $ "s3://" <> bucket <> "/" <> (o ^. oKey . _ObjectKey)
+    printKeyToHandle :: Handle -> Object -> IO ()
+    printKeyToHandle h o = Text.hPutStrLn h $ o ^. oKey . _ObjectKey
 
-    openAndWriteObjects :: Text -> NamedObjects Object -> IO ()
-    openAndWriteObjects bucket (name, objs) = do
+    openAndWriteObjects :: NamedObjects Object -> IO ()
+    openAndWriteObjects (name, objs) = do
       h <- openFile name WriteMode
-      mapM (printKeyToHandle bucket h) objs
+      mapM (printKeyToHandle h) objs
       hClose h
 

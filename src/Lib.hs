@@ -28,7 +28,7 @@ assignArrayNames :: Int -> [[Object]] -> [NamedObjects Object]
 assignArrayNames _ [] = []
 assignArrayNames i (x:xs) = (name, x) : assignArrayNames (i+1) xs
   where
-    name = "s3-list" <> show i
+    name = "s3-" <> show i <> ".list"
 
 splitEvery :: Int -> [a] -> [[a]]
 splitEvery _ [] = []
